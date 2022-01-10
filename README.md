@@ -4,12 +4,12 @@
 
 Первоначально необходимо установить `nginx`. Это делается командами:
 
-	$ sudo apt update <br>
+	$ sudo apt update
 	$ sudo apt install nginx 
 
 Используйте команду `systemd init system`, чтобы проверить работу службы:
  
-	$ systemctl status nginx <br>
+	$ systemctl status nginx
 
 Как настроить блоки сервера можно почитать [здесь](https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-20-04-ru "Установка Nginx в Ubuntu 20.04").
 
