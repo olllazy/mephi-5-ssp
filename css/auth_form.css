@@ -1,0 +1,139 @@
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* .auth_main {
+  height: 100%;
+  /* display: flex;
+  flex-direction: column;
+  margin-left: 180px; /* Same as the width of the sidenav
+  margin-right: 70px;
+  /* font-size: 28px; /* Increased text to enable scrolling
+  padding: 0px 10px;
+} */
+
+/* .container {
+  height: 50%;
+  position: relative;
+  border-radius: 5px;
+  background-color: #F2F2F2;
+  padding: 20px 0 30px 0;
+}
+
+.container label{
+  margin: 5 px;
+} */
+
+.auth_main{
+  margin-left: auto;
+  margin-right: auto;
+  padding: 16px;
+  font-size: 24px;
+  width: 65%;
+  height: 100%;
+}
+
+input [type="text"], [type="password"] {
+  /*width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 4px;
+  margin: 5px 0;
+  opacity: 0.85;
+  display: inline-block;
+  font-size: 20px;
+  line-height: 20px;
+  text-decoration: none;*/
+  /*width: 100%;
+  padding: 10px;
+  margin: 10px 0 22px 0;*/
+  display: inline-block;
+  border: unset;
+}
+
+input[type="text"]:focus, input[type="date"]:focus, input[type="email"]:focus, input[type="password"]:focus, input[type="tel"]:focus {
+  background-color: #ddd;
+  outline: none;
+}
+/* input:hover,
+.btn:hover {
+  opacity: 1;
+} */
+
+.sign-up {
+  background-color: #309F33;
+  color: white
+}
+
+button[type=submit] {
+    background-color: #D1A269;
+    color: white;
+    padding: 14px 20px;
+    margin: 0;
+    margin-top: 20px;
+    margin-left: 20px;
+    border: none;
+    cursor: pointer;
+    width: 50%;
+    opacity: 0.9;
+    font-size: 15px;
+}
+
+button[type=submit]:hover {
+    /*opacity:1;*/
+    background-color: #C19161;
+}
+
+a {
+  font-size: 15px;
+}
+
+/* .col {
+  float: left;
+  width: 50%;
+  margin: auto;
+  padding: 0 50px;
+  margin-top: 6px;
+}
+
+
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+
+.vl {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%);
+  border: 2px solid #ddd;
+  height: 175px;
+}
+
+
+.vl-innertext {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #f1f1f1;
+  border: 1px solid #ccc;
+  border-radius: 50%;
+  padding: 8px 10px;
+} */
+
+
+@media screen and (max-width: 650px) {
+  .col {
+    width: 100%;
+    margin-top: 0;
+  }
+
+  .vl {
+    display: none;
+  }
