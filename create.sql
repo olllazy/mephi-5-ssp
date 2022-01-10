@@ -12,6 +12,18 @@ CREATE TABLE client (
     CONSTRAINT client_pk PRIMARY KEY (client_id)
 );
 
+DELIMITER //
+    CREATE TRIGGER birthday_check BEFORE 
+    INSERT ON client 
+    FOR EACH ROW 
+    BEGIN 
+        IF New.birthday > curdate() THEN 
+            signal sqlstate '45000' set message_text = 'My Error Message';
+        END IF;          
+    END //
+DELIMITER ;
+
+
 -- Table: client_service
 CREATE TABLE client_service (
     id INT NOT NULL AUTO_INCREMENT,
@@ -160,6 +172,27 @@ ALTER TABLE client_service ADD CONSTRAINT visit_process FOREIGN KEY visit_proces
     REFERENCES process (process_id)
     ON DELETE CASCADE
     ON UPDATE CASCADE;
+    
+DELIMITER //
+    CREATE TRIGGER busy_day BEFORE 
+    INSERT ON client_service 
+    FOR EACH ROW 
+    BEGIN 
+        SELECT COUNT(*) INTO @isbusy 
+        FROM shed_empl 
+            WHERE shed_empl.shed_id = New.shed_empl_id AND shed_empl.is_free = 0; 
+        IF @isbusy = 0 THEN 
+            signal sqlstate '45000' set message_text = 'My Error Message';
+        ELSE 
+            SELECT COUNT(*) INTO @cnt 
+            FROM client_service 
+                WHERE shed_empl_id = New.shed_empl_id;  
+            IF @cnt = 5 THEN 
+                UPDATE shed_empl SET is_free = 1 WHERE shed_empl.shed_id = New.shed_empl_id; 
+            END IF;            
+        END IF;          
+    END //
+DELIMITER ;
 
 -- End of file.
 
