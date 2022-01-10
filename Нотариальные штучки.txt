@@ -1,0 +1,106 @@
+Нотариальные штучки 
+
+https://notkolganov.ru/tarify/ 
+	Услуга: 
+		- группа 
+		- кому 
+		- сумма 
+		- тариф 
+		- ПиТХ
+
+	Действия 
+
+Надо сделать: 
+	- добавить табличку Группы услуг 
+	- добавить поля в услуги 
+	- заполнить ебаную табличку с сайта (ура (нет)) 
+
+для пользователя
+WITH tmp1 AS ( SELECT service_id, status_id, shed_empl_id 
+	FROM client_service 
+	WHERE client_id = 2), 
+
+tmp2 AS ( SELECT service_id, name_st, shed_empl_id
+	FROM tmp1 INNER JOIN status 
+	ON tmp1.status_id = status.status_id), 
+
+tmp3 AS ( SELECT LEFT(REPLACE(name_serv,'Договор ','Д. '),20) as name_serv, name_st, shed_empl_id
+	FROM tmp2 INNER JOIN service 
+	ON tmp2.service_id = service.id), 
+
+tmp4 AS (SELECT name_serv, name_st, day, emp_id
+	FROM tmp3, shed_empl 
+	WHERE tmp3.shed_empl_id = shed_empl.shed_id)  
+
+SELECT name_serv, name_st, day, name_emp 
+	FROM tmp4 INNER JOIN employee
+	ON tmp4.emp_id = employee.emp_id;
+
+
+
+для сотрудника 
+дата | ФИО | услуга | статус |
+процесс    |   комментарий   |
+
+
+shed_empl:
+	shed_id | emp_id | day        | is_free
+client_service:
+	| id | client_id | process_id | service_id | status_id | shed_empl_id | comment |
+employee
+	emp_id | password | name_emp  | login | phone        | job_id
+-- берем расписание для этого сотрудника
+
+
+
+
+WITH tmp1 AS ( SELECT shed_id, day 
+	FROM shed_empl 
+	WHERE emp_id = 1),
+-- берем процессы 
+tmp2 AS ( SELECT day,client_id,process_id,service_id,status_id,comment
+	FROM client_service INNER JOIN tmp1 
+	ON client_service.shed_empl_id = tmp1.shed_id ),
+-- берем ФИО 
+tmp3 AS (SELECT day, process_id,service_id,status_id,comment,
+	client.client_id as client_id,first_name,last_name,patronymic 
+	FROM client INNER JOIN tmp2
+	ON client.client_id = tmp2.client_id),
+-- берем статус 
+tmp4 AS (SELECT day, process_id,service_id,name_st,comment,
+	client_id,first_name,last_name,patronymic 
+	FROM status INNER JOIN tmp3 ON status.status_id = tmp3.status_id),
+-- берем услугу 
+tmp5 AS (SELECT day, process_id,name_st,comment,
+	LEFT(REPLACE(name_serv,'Договор ','Д. '),20) AS name_serv,
+	client_id,first_name,last_name,patronymic 
+	FROM service INNER JOIN tmp4 ON service.id = tmp4.service_id)
+-- берем процесс
+SELECT day, name_proc,name_st,comment, name_serv,
+	client_id,first_name,last_name,patronymic 
+	FROM process INNER JOIN tmp5 ON process.process_id = tmp5.process_id ORDER BY day DESC;
+
+SELECT @proc := name_proc FROM process,tmp5 WHERE process.process_id = tmp5.process_id;
+
+
+DELIMITER //
+    CREATE TRIGGER busy_day BEFORE 
+    INSERT ON client_service 
+    FOR EACH ROW 
+    BEGIN 
+        SELECT COUNT(*) INTO @isbusy 
+        FROM shed_empl 
+            WHERE shed_empl.shed_id = New.shed_empl_id AND shed_empl.is_free = 0; 
+        IF @isbusy = 0 THEN 
+            signal sqlstate '45000' set message_text = 'My Error Message';
+        ELSE 
+            SELECT COUNT(*) INTO @cnt 
+            FROM client_service 
+                WHERE shed_empl_id = New.shed_empl_id;  
+            IF @cnt = 5 THEN 
+                UPDATE shed_empl SET is_free = 1 WHERE shed_empl.shed_id = New.shed_empl_id; 
+            END IF;            
+        END IF;          
+    END //
+    DELIMITER ;
+
